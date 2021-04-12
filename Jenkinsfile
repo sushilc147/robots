@@ -4,7 +4,7 @@ agent any
         stage('Checkout Code') {
             steps {
                 cleanWs()
-                git branch: "master", url:'https://github.com/sushilc147/robots.git
+                git branch: "master", url:'https://github.com/sushilc147/robots.git'
             }
         }
         stage('Execute Tests') {
