@@ -1,43 +1,47 @@
-pipeline {    
-agent any
-    stages {
-        stage('Checkout Code') {
-            steps {
-                cleanWs()
-                git branch: "master", url:'https://github.com/sushilc147/robots.git'
-            }
-        }
-        stage('Execute Tests') {
-            steps{
-                sh 'docker run -v robot'
-            }
-        }
-        stage('Proccess Results') {		
-            steps {
-                script{
-                    bat 'del "Results\\*.zip'
-                    zip zipFile: 'results/results.zip', archive: false, dir: 'results', glob: '*.html'
-                    step(
-                        [
-                            $class              : 'RobotPublisher',
-                            outputPath          : 'results',
-                            outputFileName      : "output.xml",
-                            reportFileName      : 'report.html',
-                            logFileName         : 'log.html',
-                            disableArchiveOutput: false,
-                            passThreshold       : 95.0,
-                            unstableThreshold   : 90.0,
-                            otherFiles          : "**/*.png,**/*.jpg",
-                        ]
-                    )
-                emailext body: '${SCRIPT, template="robot.template"}', subject: "[Jenkins] Robot Framework testresults for Docker Demo Project", to: 'sushilc147@gmail.com', recipientProviders: [[$class: 'CulpritsRecipientProvider']], attachmentsPattern: 'results/results.zip'
-                }
-            }
-        }
-    }
-    post {
-        always {
-            archive (includes: 'results/*.html')
-        }
-    }
+pipeline {
+  agent {
+      label 'qatest'
+  }
+  environment {
+    QA_SERVER = 'https://qa.application.com/'
+    CT_SERVER = 'http://ct.application.com/'
+
+  }
+  stages {
+	    stage('intialize') {
+	      steps {
+	        sh 'echo "PATH= ${PATH}'
+	      }
+	    }
+    
+	    stage('Run Robot Tests') {
+	      steps {
+		        	sh 'python3 -m rflint --ignore LineTooLong myapp'
+		        	sh 'python3 -m robot.run --NoStatusRC --variable SERVER:${CT_SERVER} --outputdir reports1 myapp/uiTest/testCases/smokeSuite/'
+		        	sh 'python3 -m robot.run --NoStatusRC --variable SERVER:${CT_SERVER} --rerunfailed reports1/output.xml --outputdir reports myapp/uiTest/testCases/smokeSuite/'
+		        	sh 'python3 -m robot.rebot --merge --output reports/output.xml -l reports/log.html -r reports/report.html reports1/output.xml reports/output.xml'
+		        	sh 'exit 0'
+	      		}
+	      post {
+        	always {
+		        script {
+		          step(
+			            [
+			              $class              : 'RobotPublisher',
+			              outputPath          : 'reports',
+			              outputFileName      : '**/output.xml',
+			              reportFileName      : '**/report.html',
+			              logFileName         : '**/log.html',
+			              disableArchiveOutput : false,
+			              passThreshold       : 50,
+			              unstableThreshold   : 40,
+			              otherFiles          : "**/*.png,**/*.jpg",
+			            ]
+		          	)
+		        }
+	  		}		
+	    }
+	}    
+  }
+  
 }
