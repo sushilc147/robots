@@ -9,7 +9,7 @@ agent any
         }
         stage('Execute Tests') {
             steps{
-                sh 'docker run -v ${PWD}/:/opt/robotframework/ interworks/rfrunner'
+                sh 'docker run -v ${PWD}/:${PWD}/ '
             }
         }
         stage('Proccess Results') {		
