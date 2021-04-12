@@ -9,7 +9,7 @@ agent any
         }
         stage('Execute Tests') {
             steps{
-                sh 'docker run -v ${PWD}/:${PWD}/ '
+                sh 'docker run -v robot'
             }
         }
         stage('Proccess Results') {		
