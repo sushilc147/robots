@@ -4,7 +4,7 @@ agent any
         stage('Checkout Code') {
             steps {
                 cleanWs()
-                git branch: "master", url:'https://github.com/mandibt/dockerdemotemp.git
+                git branch: "master", url:'https://github.com/sushilc147/robots.git
             }
         }
         stage('Execute Tests') {
@@ -30,7 +30,7 @@ agent any
                             otherFiles          : "**/*.png,**/*.jpg",
                         ]
                     )
-                emailext body: '${SCRIPT, template="robot.template"}', subject: "[Jenkins] Robot Framework testresults for Docker Demo Project", to: 'stefan.mandovski@interworks.com.mk', recipientProviders: [[$class: 'CulpritsRecipientProvider']], attachmentsPattern: 'results/results.zip'
+                emailext body: '${SCRIPT, template="robot.template"}', subject: "[Jenkins] Robot Framework testresults for Docker Demo Project", to: 'sushilc147@gmail.com', recipientProviders: [[$class: 'CulpritsRecipientProvider']], attachmentsPattern: 'results/results.zip'
                 }
             }
         }
