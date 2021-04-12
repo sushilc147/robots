@@ -15,11 +15,11 @@ RUN CHROMEDRIVER_VERSION=`wget --no-verbose --output-document - https://chromedr
     chmod +x /opt/chromedriver/chromedriver && \
     ln -fs /opt/chromedriver/chromedriver /usr/local/bin/chromedriver
 	
-VOLUME "$PWD/tests":/home/robot/tests
+#VOLUME "$PWD/tests":/home/robot/tests
 #VOLUME /opt/robotframework/results
 #VOLUME /opt/robotframework/tests
 #VOLUME /opt/robotframework/keywords
 #VOLUME /opt/robotframework/locators
 
 
-ENTRYPOINT ['run_tests.sh']
+ENTRYPOINT ['"$PWD"/run_tests.sh']
